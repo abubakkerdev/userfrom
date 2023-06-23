@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from "react";
+import React, { useState, useReducer, useEffect } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
@@ -29,12 +29,17 @@ const reducer = (state, action) => {
         ...initialState,
       };
     }
+    case "inputUpdateHandler": {
+      return {
+        ...action.payload,
+      };
+    }
     default:
       return state;
   }
 };
 
-function UserFrom() {
+function UserFrom(props) {
   const userInfo = useSelector((state) => state.user.value);
   const [state, inputDispatch] = useReducer(reducer, initialState);
   const dispatch = useDispatch();
@@ -52,9 +57,12 @@ function UserFrom() {
   const [selected, setSelected] = useState(options[0].value);
 
   const handleSubmit = async () => {
-    await axios.post("https://userfrom-api.vercel.app/api/v1/frontend/user/store", {
-      ...state,
-    });
+    await axios.post(
+      "https://userfrom-api.vercel.app/api/v1/frontend/user/store",
+      {
+        ...state,
+      }
+    );
     dispatch(increment());
     inputDispatch({
       type: "inputEmptyHandler",
@@ -89,16 +97,27 @@ function UserFrom() {
       { id: userInfo._id }
     );
 
-    await axios.post("https://userfrom-api.vercel.app/api/v1/frontend/user/update", {
-      ...userObj,
-    });
+    await axios.post(
+      "https://userfrom-api.vercel.app/api/v1/frontend/user/update",
+      {
+        ...userObj,
+      }
+    );
     dispatch(increment());
-    dispatch(insertData({}));
     inputDispatch({
       type: "inputEmptyHandler",
     });
     setSelected("");
   };
+
+  useEffect(() => {
+    inputDispatch({
+      type: "inputUpdateHandler",
+      payload: {
+        ...userInfo,
+      },
+    });
+  }, [userInfo]);
 
   return (
     <Card>
@@ -113,13 +132,7 @@ function UserFrom() {
                 placeholder="your name"
                 onChange={handleInputChange}
                 name="uname"
-                value={
-                  state.uname === ""
-                    ? "email" in userInfo
-                      ? userInfo.uname
-                      : ""
-                    : state.uname
-                }
+                value={state.uname}
               />
             </Form.Group>
           </Col>
@@ -131,13 +144,7 @@ function UserFrom() {
                 placeholder="name@example.com"
                 onChange={handleInputChange}
                 name="email"
-                value={
-                  state.email === ""
-                    ? "email" in userInfo
-                      ? userInfo.email
-                      : ""
-                    : state.email
-                }
+                value={state.email}
               />
             </Form.Group>
           </Col>
@@ -151,13 +158,7 @@ function UserFrom() {
                 placeholder="v$2.B@*1"
                 onChange={handleInputChange}
                 name="password"
-                value={
-                  state.password === ""
-                    ? "email" in userInfo
-                      ? userInfo.password
-                      : ""
-                    : state.password
-                }
+                value={state.password}
               />
             </Form.Group>
           </Col>
@@ -167,13 +168,7 @@ function UserFrom() {
 
               <Form.Select
                 onChange={handleInputChange}
-                value={
-                  state.country === ""
-                    ? "email" in userInfo
-                      ? userInfo.country
-                      : selected
-                    : state.country
-                }
+                value={state.country}
                 name="country"
               >
                 {options.map((option) => (

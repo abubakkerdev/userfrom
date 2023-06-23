@@ -22,9 +22,12 @@ function UserTable() {
   }, [count]);
 
   const handleDelete = async (id) => {
-    await axios.post("https://userfrom-api.vercel.app/api/v1/frontend/user/destroy", {
-      id,
-    });
+    await axios.post(
+      "https://userfrom-api.vercel.app/api/v1/frontend/user/destroy",
+      {
+        id,
+      }
+    );
     dispatch(increment());
   };
 
